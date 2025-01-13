@@ -11,9 +11,10 @@ class Database
 {
     public $connection;
     private  $dsn;
+    private static $instance = null; 
 
 
-    public function __construct()
+    private function __construct()
     {
         $this->dsn = "mysql:host=" . HOST . ";port=" . PORT . ";dbname=" . DBNAME;
 
@@ -35,6 +36,15 @@ class Database
             }
         }
     }
+
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new Database();  
+        }
+        return self::$instance;
+    }
+    
     public function lastInsertId(){
         return $this->connection->lastInsertId();
     }
