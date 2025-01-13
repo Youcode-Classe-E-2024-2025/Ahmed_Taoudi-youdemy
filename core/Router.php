@@ -24,13 +24,13 @@ class Router {
         if (isset($this->routes[$path])) {
             $controller = $this->routes[$path]['controller'];
             $action = $this->routes[$path]['action'];
-            $controllerPath = "controllers/{$controller}.php";
+            $controllerPath = "app/controllers/{$controller}.php";
             // dd($controllerPath);
             require_once $controllerPath;
             $controller = new $controller($this->db);
             return $controller->$action();
         }else{
-            return require_once "views/errors/404.php";
+            return require_once "app/views/errors/404.php";
         }
         
 
