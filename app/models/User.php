@@ -157,6 +157,45 @@ class User
         }
     }
 
+    // SOFT DELETE 
+    public function delete(): bool
+    {
+        $query = "UPDATE " . $this->table . "
+                  SET status = :archived
+                  WHERE id = :id";
 
+        $params = [
+            ':archived' => UserStatus::ARCHIVED->value,
+            ':id' => $this->id
+        ];
+
+        try {
+            $this->conn->query($query, $params);
+            return true;
+        } catch (PDOException $e) {
+            error_log("Error deleting user: " . $e->getMessage());
+            return false;
+        }
+    }
+    // Restore (set status to active) 
+    public function restore(): bool
+    {
+        $query = "UPDATE " . $this->table . "
+                  SET status = :active
+                  WHERE id = :id";
+
+        $params = [
+            ':active' => UserStatus::ACTIVE->value,
+            ':id' => $this->id
+        ];
+
+        try {
+            $this->conn->query($query, $params);
+            return true;
+        } catch (PDOException $e) {
+            error_log("Error restoring user: " . $e->getMessage());
+            return false;
+        }
+    }
 
     }
