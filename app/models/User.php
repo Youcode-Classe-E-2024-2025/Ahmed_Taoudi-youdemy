@@ -107,4 +107,28 @@ class User
         }
     }
 
-}
+    public function read($id = null, bool $includeArchived = false): array
+    {
+        $query = "SELECT u.* FROM " . $this->table . " u";
+        $params = [];
+
+        if (!$includeArchived) {
+            $query .= " WHERE u.status != :archived";
+            $params[':archived'] = UserStatus::ARCHIVED->value;
+        }
+
+        if ($id) {
+            $query .= $includeArchived ? " AND u.id = :id" : " WHERE u.id = :id";
+            $params[':id'] = $id;
+        }
+
+        try {
+            $result = $this->conn->query($query, $params);
+            return $result->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error reading user: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    }
