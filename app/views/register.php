@@ -121,9 +121,9 @@
                         <div class="grid grid-cols-2 gap-4">
                             <!-- Étudiant Card -->
                             <label class="cursor-pointer">
-                                <input type="radio" name="role" value="etudiant" 
+                                <input type="radio" name="role" value="student" 
                                     class="hidden peer"
-                                    <?php echo (isset($_SESSION['old']['role']) && $_SESSION['old']['role'] === 'etudiant') ? 'checked' : ''; ?>>
+                                    <?php echo (isset($_SESSION['old']['role']) && $_SESSION['old']['role'] === 'student') ? 'checked' : ''; ?>>
                                 <div class="p-4 border-2 border-gray-200 rounded-lg transition-all duration-200 ease-in-out
                                             peer-checked:border-emerald-500 peer-checked:bg-emerald-50 hover:border-emerald-300">
                                     <div class="flex items-center justify-between">
@@ -138,9 +138,9 @@
 
                             <!-- Enseignant Card -->
                             <label class="cursor-pointer">
-                                <input type="radio" name="role" value="enseignant" 
+                                <input type="radio" name="role" value="teacher" 
                                     class="hidden peer"
-                                    <?php echo (isset($_SESSION['old']['role']) && $_SESSION['old']['role'] === 'enseignant') ? 'checked' : ''; ?>>
+                                    <?php echo (isset($_SESSION['old']['role']) && $_SESSION['old']['role'] === 'teacher') ? 'checked' : ''; ?>>
                                 <div class="p-4 border-2 border-gray-200 rounded-lg transition-all duration-200 ease-in-out
                                             peer-checked:border-emerald-500 peer-checked:bg-emerald-50 hover:border-emerald-300">
                                     <div class="flex items-center justify-between">
