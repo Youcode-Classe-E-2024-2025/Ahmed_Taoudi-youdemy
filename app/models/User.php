@@ -198,4 +198,39 @@ class User
         }
     }
 
+
+    public function login(string $email, string $password)
+    {
+        $query = "SELECT u.* FROM " . $this->table . " u 
+                  WHERE u.email = :email AND u.status != :archived";
+
+        $params = [
+            ':email' => $email,
+            ':archived' => UserStatus::ARCHIVED->value
+        ];
+
+        try {
+            $result = $this->conn->query($query, $params);
+            $user = $result->fetch(PDO::FETCH_ASSOC);
+
+            if ($user && password_verify($password, $user['password'])) {
+                return $user;
+            }
+            return false;
+        } catch (PDOException $e) {
+            error_log("Error logging in: " . $e->getMessage());
+            return false;
+        }
     }
+
+
+    public function countUsers()
+    {
+        $query = "SELECT COUNT(*) as total FROM " . $this->table;
+        $result = $this->conn->query($query, []);
+        return $result->fetch(PDO::FETCH_ASSOC)['total'];
+    }
+
+
+
+}
