@@ -130,5 +130,33 @@ class User
             return [];
         }
     }
+    public function update(): bool
+    {
+        $query = "UPDATE " . $this->table . "
+                  SET name = :name,
+                      email = :email,
+                      status = :status,
+                      role = :role
+                  WHERE id = :id AND status != :archived";
+
+        $params = [
+            ':name' => $this->name,
+            ':email' => $this->email,
+            ':status' => $this->status->value,
+            ':role' => $this->role->value,
+            ':id' => $this->id,
+            ':archived' => UserStatus::ARCHIVED->value
+        ];
+
+        try {
+            $this->conn->query($query, $params);
+            return true;
+        } catch (PDOException $e) {
+            error_log("Error updating user: " . $e->getMessage());
+            return false;
+        }
+    }
+
+
 
     }
