@@ -1,4 +1,5 @@
 <?php
+require_once 'app/enums/Role.php';
 
 class Validator
 {
@@ -48,8 +49,13 @@ class Validator
     {
         if (empty($role)) {
             $this->errors['role'] = "Veuillez sélectionner un rôle.";
-        } elseif (!in_array($role, ['etudiant', 'enseignant'])) {
-            $this->errors['role'] = "Rôle invalide.";
+        } else {
+
+            $validRoles = array_map(function ($role) { return $role->value; }, Role::cases());
+            
+            if (!in_array($role, $validRoles)) {
+                $this->errors['role'] = "Rôle invalide.";
+            }
         }
     }
 
