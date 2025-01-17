@@ -1,13 +1,13 @@
 <?php
 
-require_once 'app/models/User.php';
-require_once "app/enums/Role.php";
-require_once "app/enums/UserStatus.php";
+// require_once 'app/models/User.php';
+// require_once "app/enums/Role.php";
+// require_once "app/enums/UserStatus.php";
 
 
 class AuthController extends BaseController
 {
-    private $userModel;
+    private User $userModel;
 
     public function __construct()
     {
