@@ -14,26 +14,43 @@
                     <a href="/" class="text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-sm font-medium">
                         Accueil
                     </a>
-                    <a href="#courses" class="text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-sm font-medium">
+                    <a href="/courses" class="text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-sm font-medium">
                         Cours
                     </a>
-                    <a href="#features" class="text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-sm font-medium">
+                    <a href="/#features" class="text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-sm font-medium">
                         Fonctionnalités
                     </a>
                 </div>
             </div>
-            <!-- Auth Buttons -->
-            <div class="hidden md:block">
-                <div class="ml-4 flex items-center space-x-4">
-                    <a href="/login" class="text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-sm font-medium">
-                        Connexion
-                    </a>
-                    <a href="/register"
-                        class="rounded-md bg-emerald-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
-                        S'inscrire
-                    </a>
+            <?php if (!isset($_SESSION['user'])): ?>
+                <!-- Auth Buttons -->
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center space-x-4">
+                        <a href="/login" class="text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-sm font-medium">
+                            Connexion
+                        </a>
+                        <a href="/register"
+                            class="rounded-md bg-emerald-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
+                            S'inscrire
+                        </a>
+
+                    </div>
                 </div>
-            </div>
+            <?php else: ?>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center space-x-4">
+                        <a href="/<?= $_SESSION['user']['role'] ?>/dashboard" class="text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="ri-user-fill"></i>
+                            <?= $_SESSION['user']['name'] ?>
+                        </a>
+                        <a href="/logout" class="rounded-md bg-emerald-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
+                            <span class="ml-1">Log Out</span>
+                            <i class="ri-logout-circle-r-line text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+            <?php endif; ?>
             <!-- Mobile Menu Button -->
             <div class="-mr-2 flex md:hidden">
                 <button type="button"
@@ -52,12 +69,13 @@
             <a href="/" class="block text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-base font-medium">
                 Accueil
             </a>
-            <a href="#courses" class="block text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-base font-medium">
+            <a href="/courses" class="block text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-base font-medium">
                 Cours
             </a>
-            <a href="#features" class="block text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-base font-medium">
+            <a href="/#features" class="block text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-base font-medium">
                 Fonctionnalités
             </a>
+            <?php if (!isset($_SESSION['user'])): ?>
             <a href="/login" class="block text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-base font-medium">
                 Connexion
             </a>
@@ -65,30 +83,42 @@
                 class="block rounded-md bg-emerald-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
                 S'inscrire
             </a>
+            <?php else:?>
+                <a href="/login" class="block text-gray-900 hover:text-emerald-600 px-3 py-2 rounded-md text-base font-medium">
+                <i class="ri-user-fill"></i>
+                <?= $_SESSION['user']['name'] ?>
+            </a>
+            <a href="/register"
+                class="block rounded-md bg-emerald-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
+                <span class="ml-1">Log Out</span>
+                <i class="ri-logout-circle-r-line text-xs"></i>
+            </a>
+            <?php endif;?>
+
         </div>
     </div>
 </nav>
 <script>
-// Toggle mobile menu
-document.addEventListener('DOMContentLoaded', function () {
-    const mobileMenuButton = document.querySelector('[aria-controls="mobile-menu"]');
-    const mobileMenu = document.getElementById('mobile-menu');
+    // Toggle mobile menu
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuButton = document.querySelector('[aria-controls="mobile-menu"]');
+        const mobileMenu = document.getElementById('mobile-menu');
 
-    if (mobileMenuButton && mobileMenu) {
-        mobileMenuButton.addEventListener('click', function () {
-            const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
-            mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
-            mobileMenu.classList.toggle('hidden');
-        });
-    }
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
 
-    // Close mobile menu when a link is clicked
-    const mobileMenuLinks = document.querySelectorAll('#mobile-menu a');
-    mobileMenuLinks.forEach(link => {
-        link.addEventListener('click', function () {
-            mobileMenu.classList.add('hidden');
-            mobileMenuButton.setAttribute('aria-expanded', 'false');
+        // Close mobile menu when a link is clicked
+        const mobileMenuLinks = document.querySelectorAll('#mobile-menu a');
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.add('hidden');
+                mobileMenuButton.setAttribute('aria-expanded', 'false');
+            });
         });
     });
-});
 </script>
