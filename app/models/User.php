@@ -1,7 +1,7 @@
 <?php
 
-require_once "app/enums/Role.php";
-require_once "app/enums/UserStatus.php";
+// require_once "app/enums/Role.php";
+// require_once "app/enums/UserStatus.php";
 
 class User
 {
@@ -80,6 +80,9 @@ class User
     {
         $this->role = $role;
     }
+    public function setCreatedAt($date){
+        $this->created_at = date('d M Y', strtotime($date));
+    }
 
 
     //create
@@ -109,6 +112,7 @@ class User
 
     public function read($id = null, bool $includeArchived = false): array
     {
+        $users = [];
         $query = "SELECT u.* FROM " . $this->table . " u";
         $params = [];
 
@@ -124,7 +128,14 @@ class User
 
         try {
             $result = $this->conn->query($query, $params);
-            return $result->fetchAll(PDO::FETCH_ASSOC);
+            $data = $result->fetchAll(PDO::FETCH_ASSOC);
+            if($data){
+                foreach($data as $item){
+                    $users[]= $this->createObject($item);
+                }
+            }
+            return $users;
+
         } catch (PDOException $e) {
             error_log("Error reading user: " . $e->getMessage());
             return [];
@@ -229,6 +240,34 @@ class User
         $query = "SELECT COUNT(*) as total FROM " . $this->table;
         $result = $this->conn->query($query, []);
         return $result->fetch(PDO::FETCH_ASSOC)['total'];
+    }
+    public function getById($id)
+    {
+        $query = "SELECT  *  FROM $this->table where id = :id ";
+        $params =['id'=>$id];
+        try {
+            $result = $this->conn->query($query, $params);
+            $user = $result->fetch(PDO::FETCH_ASSOC);
+            if ($user) {
+                $this->setName($user['name']);
+                $this->setEmail($user['email']);
+                $this->setRole(Role::from($user['role']));
+                $this->setStatus(UserStatus::from($user['status']));
+            }
+        } catch (PDOException $e) {
+            error_log("Error logging in: " . $e->getMessage());
+            return false;
+        }
+    }
+    private function createObject($user){
+        $object = new User();
+       $object->setId($user['id']);
+       $object->setName($user['name']);
+       $object->setEmail($user['email']);
+       $object->setCreatedAt($user['created_at']);
+       $object->setStatus(UserStatus::from($user['status']));
+       $object->setRole(Role::from($user['role']));
+       return $object;
     }
 
 
