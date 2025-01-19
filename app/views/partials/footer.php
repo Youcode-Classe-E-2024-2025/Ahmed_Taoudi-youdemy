@@ -50,7 +50,7 @@
         </div>
         <!-- Copyright -->
         <div class="mt-12 border-t border-gray-200 pt-8 text-center">
-            <p class="text-sm leading-6 text-gray-600">&copy; 2023 Youdemy. Tous droits réservés.</p>
+            <p class="text-sm leading-6 text-gray-600">&copy; <?= date('Y');?> Youdemy. Tous droits réservés.</p>
         </div>
     </div>
 </footer>
