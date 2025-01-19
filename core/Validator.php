@@ -9,7 +9,7 @@ class Validator
     // Validate Name
     public function validateName($name)
     {
-        if (empty($name)) {
+        if (empty(trim($name))) {
             $this->errors['name'] = "Le nom est requis.";
         }
     }
@@ -57,6 +57,25 @@ class Validator
                 $this->errors['role'] = "Rôle invalide.";
             }
         }
+    }
+    
+    // Validate
+    public function validateString($str,$errorname)
+    {
+        if (empty(trim($str))) {
+            $this->errors["$errorname"] = " $errorname est requis.";
+        }
+    }
+
+    public function validateArrayOfString($arr_str,$errorname){
+        if (isset($arr_str) && is_array($arr_str)) {
+            foreach($arr_str as $str){
+                $this->validateString($str,$errorname);
+            }
+        }else{
+            $this->errors["$errorname"] = " $errorname est requis.";
+        }
+
     }
 
     // Get Validation Errors
