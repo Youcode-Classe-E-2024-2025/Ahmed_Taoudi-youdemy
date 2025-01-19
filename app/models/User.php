@@ -110,20 +110,24 @@ class User
         }
     }
 
-    public function read($id = null, bool $includeArchived = false): array
+    public function read($id = 1, $status = 'active' ,$order = null): array
     {
         $users = [];
-        $query = "SELECT u.* FROM " . $this->table . " u";
+        $query = "SELECT u.* FROM $this->table  u WHERE u.role != 'admin' " ;
         $params = [];
 
-        if (!$includeArchived) {
-            $query .= " WHERE u.status != :archived";
-            $params[':archived'] = UserStatus::ARCHIVED->value;
+        if ($status !== 'all') {
+            $query .= " AND u.status = :user_status  ";
+            $params[':user_status'] = UserStatus::from($status)->value;
         }
 
         if ($id) {
-            $query .= $includeArchived ? " AND u.id = :id" : " WHERE u.id = :id";
+            $query .= " AND u.id = :id ";
             $params[':id'] = $id;
+        }
+
+        if ($order){
+            $query .= " ORDER BY $order DESC ";
         }
 
         try {
@@ -250,6 +254,7 @@ class User
             $user = $result->fetch(PDO::FETCH_ASSOC);
             if ($user) {
                 $this->setName($user['name']);
+                $this->setId($user['id']);
                 $this->setEmail($user['email']);
                 $this->setRole(Role::from($user['role']));
                 $this->setStatus(UserStatus::from($user['status']));
