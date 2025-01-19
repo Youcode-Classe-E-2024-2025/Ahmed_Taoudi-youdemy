@@ -9,16 +9,26 @@ class Course
     private $id;
     private $name;
     private $description;
-    private $category;
+    private Category $category;
     private $tags = [];
-    private $created_by;
+    private Teacher  $created_by;
     private File $image;
-    private $content;
+    private File $content;
     private $created_at;
+    private bool $visibility;
 
     // Constructor
-    public function __construct()
+    public function __construct($name=null,$description=null,$category_id =null ,$tags=[],$created_by=null,$created_at=null,File $image=new File(),File $content=new File() )
     {
+        
+        $this->setName($name);
+        $this->setDescription($description);
+        $this->setOwner($created_by);
+        $this->setCreatedAt($created_at);
+        $this->setCategory($category_id);
+        $this->setImage($image);
+        $this->setContent($content);
+        $this->tags = $tags;
         $this->conn = Database::getInstance();
     }
 
@@ -86,6 +96,10 @@ class Course
        $this->image = $file;
     }
 
+    public function  setContent($file){
+        $this->content = $file;
+     }
+
     public function setOwner($user_id)
     {
 
@@ -108,6 +122,7 @@ class Course
 
     public function getCourses($limit = 0, $offset = 0)
     {
+
         $query = "SELECT c.*, f.id AS image_id, f.name AS image_name, f.path AS image_path 
                       FROM $this->table c
                       LEFT JOIN course_files cf ON c.id = cf.course_id
@@ -118,17 +133,7 @@ class Course
         $results = $this->conn->pagination($query, $params, $limit, $offset)->fetchAll();
         $courses = [];
         foreach ($results as $row) {
-            $course = new Course();
-            $course->setId($row['id']);
-            $course->setName($row['name']);
-            $course->setDescription($row['description']);
-            $course->setOwner($row['created_by']);
-            $course->setCreatedAt($row['created_at']);
-            $course->setCategory($row['category_id']);
-            $course->setImage( new File($row['image_name'],$row['image_path'],'photo'));
-            $course->tags = $this->getTagsBycourse($row['id']);
-
-            $courses[] = $course;
+            $courses[] = $this->createObject($row);
         }
 
         return $courses;
@@ -270,5 +275,44 @@ class Course
             error_log("Error add tags: " . $e->getMessage());
             return false;
         }
+    }
+
+    public function getCoursesByCategory($ctg_id,$limit = 0, $offset = 0)
+    {
+        $query = "SELECT c.*, f.id AS image_id, f.name AS image_name, f.path AS image_path 
+                      FROM $this->table c
+                      LEFT JOIN course_files cf ON c.id = cf.course_id
+                      LEFT JOIN files f ON cf.file_id = f.id AND f.file_type_id = (SELECT id FROM file_types WHERE name = 'photo') 
+                      WHERE c.category_id= :ctg_id  
+                      ORDER BY c.created_at DESC"; 
+        $params = ['ctg_id'=>$ctg_id];
+
+        $results = $this->conn->pagination($query, $params, $limit, $offset)->fetchAll();
+        $courses = [];
+
+        foreach ($results as $row) {
+            $courses[] = $this->createObject($row);
+        }
+
+        return $courses;
+    }
+
+    public function createObject($row){
+        $course = new Course($row['name'],$row['description'],$row['category_id'],$this->getTagsBycourse($row['id']),$row['created_by'],$row['created_at'],new File($row['image_name'],$row['image_path'],'photo'));
+        $course->setId($row['id']);
+       return $course;
+    }
+
+    public function getCount($ctg_id=null){
+
+        $query = "SELECT  COUNT(*)
+                FROM $this->table c ";
+        $params = [];
+        if($ctg_id){
+            $query .= " WHERE c.category_id = :id ";
+           $params['id'] = $ctg_id ;
+        }
+
+        return $this->conn->query($query,$params)->fetchColumn();
     }
 }
