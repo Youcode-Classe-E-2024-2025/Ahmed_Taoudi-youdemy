@@ -20,9 +20,7 @@ class CourseController extends BaseController
 
     public function create()
     {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/login');
-        }
+        $this->requireRole(Role::TEACHER);
 
         if ($this->isPost()) {
             // Debug::dd($_POST, $_FILES, $this->user['id']);
@@ -70,17 +68,6 @@ class CourseController extends BaseController
                 ];
                 $this->redirect('/teacher/course/add');
             }
-            if (!empty($_FILES['image']['name'])) {
-
-                if ($this->fileModel->upload(1, $_FILES['image'])) {
-                } else {
-                    $this->setFlashMessage('error', 'Registration failed. Please try again.');
-                    $this->redirect('/register');
-                }
-            }
-            $content = "app/views/admin/courses.php";
-            $courses = $this->courseModel->getCourses();
-            $this->render('admin', ['content' => $content, 'courses' => $courses]);
         } else {
             $this->_404();
         }
