@@ -28,7 +28,7 @@ class Database
 
             if ($e->getCode() == 1049) {
                 // require_once("views/support/createDB.php"); 
-                header('location: app/views/support/createDB.php');
+                header('location: /app/views/support/createDB.php');
                 exit;
             } else {
                 // Log the error instead of displaying it
