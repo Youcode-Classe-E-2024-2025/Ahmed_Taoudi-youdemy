@@ -3,20 +3,24 @@
 
 class AdminController extends BaseController
 {
-    private $userModel;
+    private User $userModel;
+    private Category $categoryModel;
+    private Tag $tagModel;
+    private Course $courseModel;
 
     public function __construct()
     {
         parent::__construct();
         $this->userModel = new User();
+        $this->categoryModel = new Category();
+        $this->tagModel = new Tag();
+        $this->courseModel = new Course();
     }
 
 
     public function index()
     {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/login');
-        }
+        $this->requireRole(Role::ADMIN);
 
         if ($this->isGet()) {
             $content = "app/views/admin/dashboard.php";
@@ -27,39 +31,50 @@ class AdminController extends BaseController
     }
     public function courses()
     {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/login');
-        }
-
-        if ($this->isGet()) {
+         $this->requireRole(Role::ADMIN);
+         if ($this->isGet()) {
+            $limit=12;
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1 ; 
+            $count = $this->courseModel->getCount();
+            // Debug::pd($count);
+            $totalPages =ceil( $count/$limit) ;
+            // validation
+            if($page <= 0 || $page >$totalPages){
+                
+                $page=1;
+            }
+            $offset = $limit * ($page-1);
             $content = "app/views/admin/courses.php";
-            $this->render('admin',['content'=>$content]);
+            $courses = $this->courseModel->getCourses($limit,$offset);
+            $this->render('admin',
+            ['content'=>$content , 
+            'courses'=>$courses ,
+            'page'=>$page ,
+            'totalPages'=>$totalPages]);
         }else{
             $this->_404();
         }
     }
     public function categories()
     {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/login');
-        }
+        $this->requireRole(Role::ADMIN);
 
         if ($this->isGet()) {
             $content = "app/views/admin/categories.php";
-            $this->render('admin',['content'=>$content]);
+            $categorys = $this->categoryModel->getAllCategories();
+            $this->render('admin',['content'=>$content ,'categorys'=>$categorys]);
         }else{
             $this->_404();
         }
     }
     public function tags()
     {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/login');
-        }
+        $this->requireRole(Role::ADMIN);
 
         if ($this->isGet()) {
             $content = "app/views/admin/tags.php";
-            $this->render('admin',['content'=>$content]);
+            $tags = $this->tagModel->getAllTags();
+            $this->render('admin',['content'=>$content ,'tags'=>$tags]);
         }else{
             $this->_404();
         }
@@ -67,9 +82,7 @@ class AdminController extends BaseController
 
     public function statistics()
     {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/login');
-        }
+        $this->requireRole(Role::ADMIN);
 
         if ($this->isGet()) {
             $content = "app/views/admin/statistics.php";
@@ -81,13 +94,13 @@ class AdminController extends BaseController
 
     public function users()
     {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/login');
-        }
+        $this->requireRole(Role::ADMIN);
 
         if ($this->isGet()) {
             $content = "app/views/admin/users.php";
-            $users = $this->userModel->read(null,true);
+            $status = $_GET['status'] ?? 'all' ;
+            if (!UserStatus::tryFrom($status)) $status= 'all';
+            $users = $this->userModel->read(null, $status ,'name'); // read(id,)
             $this->render('admin',['content'=>$content , 'users'=>$users]);
         }else{
             $this->_404();
