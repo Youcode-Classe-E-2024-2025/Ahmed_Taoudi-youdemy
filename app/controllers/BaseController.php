@@ -22,6 +22,13 @@ class BaseController {
             $this->redirect('/login');
         }
     }
+    protected function requireRole($role){
+        $this->requireAuth();
+        if ($this->user['role']!==$role->value ) {
+            // Debug::dd($this->user,Role::ADMIN);
+           $this->_403();
+        }
+    }
 
     protected function isLoggedIn() {
         return isset($_SESSION['user']) && !empty($_SESSION['user']);
@@ -71,5 +78,10 @@ class BaseController {
 
     protected function _404() {
         require "app/views/errors/404.php";
+        exit;
+    }
+    protected function _403() {
+        require "app/views/errors/403.php";
+        exit;
     }
 }

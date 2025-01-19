@@ -12,8 +12,7 @@ class CategoryController extends BaseController
 
     public function create()
     {
-
-        // Handle POST request
+        $this->requireRole(Role::ADMIN);
         if ($this->isPost()) {
             // Verify CSRF token
             $token = $_POST['csrf_token'] ?? '';

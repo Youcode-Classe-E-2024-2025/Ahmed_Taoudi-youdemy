@@ -19,7 +19,7 @@ class AuthController extends BaseController
     {
         // Redirect if the user is already logged in
         if ($this->isLoggedIn()) {
-            $this->redirect('/');
+            $this->redirect("/{$this->user['role']}/dashboard");
         }
     
         // Handle POST request
@@ -83,7 +83,7 @@ class AuthController extends BaseController
     public function register()
     {
         if ($this->isLoggedIn()) {
-            $this->redirect('/');
+            $this->redirect("/{$this->user['role']}/dashboard");
         }
         if ($this->isPost()) {
             // Debug::dd($_POST);
