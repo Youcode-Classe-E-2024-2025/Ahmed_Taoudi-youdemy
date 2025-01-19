@@ -7,8 +7,10 @@ class Tag {
     private $id;
     private $name;
 
-    public function __construct() {
+    public function __construct($name=null) {
+        $this->setName($name);
         $this->conn = Database::getInstance();
+        
     }
 
     // Getters
@@ -29,15 +31,36 @@ class Tag {
     }
 
     // CRUD Operations
-    public function create() {
-        $query = "INSERT INTO " . $this->table . " (name) VALUES (:name)";
-        $stmt = $this->conn->query($query, [':name' => $this->name]);
-        
-        if ($stmt) {
-            $this->id = $this->conn->lastInsertId();
-            return true;
+    public function create($array) {
+       
+        if (empty($array)) {
+            return false;
         }
-        return false;
+        
+        $data = [];
+        $id = 0;
+        foreach ($array as $ctg) {
+            $data[] = "(:name$id)";
+            $id++;
+        }
+ 
+        $query = "INSERT INTO $this->table  ( name ) 
+                VALUES " . implode(", ", $data) . "
+                ON DUPLICATE KEY UPDATE name = VALUES(name)";  
+
+        $id=0;
+        foreach ($array as $ctg) {
+            $params[":name$id"] = $ctg->getName(); 
+            $id++;
+        }
+
+        try {
+            $this->conn->query($query, $params);
+            return true;
+        } catch (PDOException $e) {
+            error_log("Error add tags: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function read($id) {
