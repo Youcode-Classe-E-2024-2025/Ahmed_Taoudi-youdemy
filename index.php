@@ -12,10 +12,14 @@ require_once 'app/controllers/BaseController.php';
 require_once "app/enums/Role.php";
 require_once "app/enums/UserStatus.php";
 
+require_once "app/interfaces/UserCourses.php";
+
 require_once "app/models/Course.php";
 require_once "app/models/Teacher.php";
+require_once "app/models/Student.php";
 require_once "app/models/Category.php";
 require_once "app/models/Tag.php";
+require_once "app/models/File.php";
 require_once "app/models/User.php";
 
 
