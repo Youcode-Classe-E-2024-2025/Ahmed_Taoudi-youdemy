@@ -14,16 +14,38 @@ class HomeController extends BaseController
     }
 
     public function index(){
-        $courses =$this->courseModel->getCourses();
-        $this->render('home',['courses'=>$courses]);
+        // $this->redirect(__DIR__."../../../uploads/courses/3");
+        $categories = $this->categoryModel->getAllCategories();
+        $courses =$this->courseModel->getCourses(3);
+        $this->render('home',['courses'=>$courses , 'categories'=>$categories ]);
     }
+
     public function courses(){
+        $limit = 9;
+        $ctg_id = isset($_GET['category']) ? (int)$_GET['category'] : null ; 
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1 ; 
+        $count = $this->courseModel->getCount($ctg_id);
+        $totalPages =ceil( $count/$limit) ;
+        // validation
+        if($page <= 0 || $page >$totalPages){ 
+            $page=1;
+        }
+        // Debug::pd($page);
+        $offset = $limit * ($page-1);
+        if($ctg_id){
+
+            $courses = $this->courseModel->getCoursesByCategory($ctg_id,$limit,$offset);
+        }else{
+            $courses = $this->courseModel->getCourses($limit,$offset);
+        }
+
         $categories = $this->categoryModel->getAllCategories();
         $tags = $this->tagModel->getAllTags();
-        $courses = $this->courseModel->getCourses();
         $this->render('courses',
         ['courses'=>$courses ,
         'categories'=>$categories ,
+        'page'=>$page ,
+        'totalPages'=>$totalPages ,
         'tags'=>$tags ]);
     }
     
