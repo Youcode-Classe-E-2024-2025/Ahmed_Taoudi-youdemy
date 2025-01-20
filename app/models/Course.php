@@ -69,6 +69,9 @@ class Course
     public function getImage(){
         return $this->image;
     }
+    public function getContent(){
+        return $this->content;
+    }
 
     // Setters
     public function setId($id)
@@ -122,12 +125,14 @@ class Course
 
     public function getCourses($limit = 0, $offset = 0)
     {
+        $query = "SELECT c.*,   MAX(f.id) AS image_id,    MAX(f.name) AS image_name,   MAX(f.path) AS image_path
+                FROM $this->table c
+                LEFT JOIN course_files cf ON c.id = cf.course_id
+                LEFT JOIN files f ON cf.file_id = f.id 
+                    AND f.file_type_id = (SELECT id FROM file_types WHERE name = 'photo')  
+                GROUP BY c.id
+                ORDER BY c.created_at DESC";
 
-        $query = "SELECT c.*, f.id AS image_id, f.name AS image_name, f.path AS image_path 
-                      FROM $this->table c
-                      LEFT JOIN course_files cf ON c.id = cf.course_id
-                      LEFT JOIN files f ON cf.file_id = f.id AND f.file_type_id = (SELECT id FROM file_types WHERE name = 'photo')
-                      ORDER BY c.created_at DESC"; 
         $params = [];
 
         $results = $this->conn->pagination($query, $params, $limit, $offset)->fetchAll();
@@ -165,7 +170,13 @@ class Course
     // Get a single course by ID
     public function getById($id)
     {
-        $query = "SELECT * FROM $this->table WHERE id = :id";
+        $query = " SELECT c.*, MAX(f.id) AS image_id, MAX(f.name) AS image_name, MAX(f.path) AS image_path
+            FROM $this->table c
+            LEFT JOIN course_files cf ON c.id = cf.course_id
+            LEFT JOIN files f ON cf.file_id = f.id 
+            AND f.file_type_id = (SELECT id FROM file_types WHERE name = 'photo') 
+            WHERE c.id = :id
+            GROUP BY c.id";
         $params = [':id' => $id];
         $result = $this->conn->query($query, $params)->fetch();
         if ($result) {
@@ -173,6 +184,7 @@ class Course
             $this->setName($result['name']);
             $this->setDescription($result['description']);
             $this->setOwner($result['created_by']);
+            $this->setImage(new File($result['image_name'],$result['image_path'],'photo'));
             $this->setCategory($result['category_id']);
             $this->tags = $this->getTagsBycourse($result['id']);
         }
@@ -279,12 +291,14 @@ class Course
 
     public function getCoursesByCategory($ctg_id,$limit = 0, $offset = 0)
     {
-        $query = "SELECT c.*, f.id AS image_id, f.name AS image_name, f.path AS image_path 
-                      FROM $this->table c
-                      LEFT JOIN course_files cf ON c.id = cf.course_id
-                      LEFT JOIN files f ON cf.file_id = f.id AND f.file_type_id = (SELECT id FROM file_types WHERE name = 'photo') 
-                      WHERE c.category_id= :ctg_id  
-                      ORDER BY c.created_at DESC"; 
+        $query = " SELECT c.*,   MAX(f.id) AS image_id,    MAX(f.name) AS image_name,   MAX(f.path) AS image_path
+                FROM $this->table c
+                LEFT JOIN course_files cf ON c.id = cf.course_id
+                LEFT JOIN files f ON cf.file_id = f.id 
+                AND f.file_type_id = (SELECT id FROM file_types WHERE name = 'photo') 
+                WHERE c.category_id = :ctg_id
+                GROUP BY c.id
+                ORDER BY c.created_at DESC"; 
         $params = ['ctg_id'=>$ctg_id];
 
         $results = $this->conn->pagination($query, $params, $limit, $offset)->fetchAll();
@@ -315,4 +329,40 @@ class Course
 
         return $this->conn->query($query,$params)->fetchColumn();
     }
+
+    public function findById($id){
+        $query = "SELECT *
+                FROM $this->table c 
+                WHERE c.id = :id ";
+        $params['id'] = $id ;
+        $result = $this->conn->query($query,$params)->fetch();
+
+        if($result){
+            return true;
+        }
+        return false;
+    }
+    
+    public function isUserEnrolled($userId){
+        $query = "SELECT * FROM student_course WHERE student_id = :user_id AND course_id = :course_id";
+       $params =['user_id' => $userId, 'course_id' => $this->getId()];
+        
+       $result = $this->conn->query($query,$params)->fetch();
+       if($result){
+           return true;
+       }
+       return false;
+    }
+
+    public function enrollUser($userId){
+        $query = "INSERT INTO student_course (course_id, student_id  ) VALUES ( :course_id , :user_id) ";
+        $params =['user_id' => $userId, 'course_id' => $this->getId()];
+        
+       $result = $this->conn->query($query,$params);
+       if($result){
+           return true;
+       }
+       return false;
+    }
+    
 }
