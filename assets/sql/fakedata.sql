@@ -71,31 +71,6 @@ VALUES
     (6, 8, NOW()), -- Nadia enrolled in Introduction to Cybersecurity
     (7, 9, NOW()); -- Hassan enrolled in Machine Learning Basics
 
-    -- Insert files
--- Insert files
-INSERT INTO files (name, path, file_type_id)
-VALUES
-    ('image1.jpg', 'uploads/courses/1/image1.jpg', 1), -- image for course 1
-    ('image2.jpg', 'uploads/courses/2/image2.jpg', 1), -- image for course 2
-    ('image3.jpg', 'uploads/courses/3/image3.jpg', 1), -- image for course 3
-    ('image4.jpg', 'uploads/courses/4/image4.jpg', 1), -- image for course 4
-    ('image5.jpg', 'uploads/courses/5/image5.jpg', 1), -- image for course 5
-    ('image6.jpg', 'uploads/courses/6/image6.jpg', 1), -- image for course 6
-    ('image7.jpg', 'uploads/courses/7/image7.jpg', 1); -- image for course 7
-
--- Link files to courses
-INSERT INTO course_files (course_id, file_id)
-VALUES
-    (1, 1), -- Course 1: Photo
-    (2, 2), -- Course 2: Photo
-    (3, 3), -- Course 3: Photo
-    (4, 4), -- Course 4: Photo
-    (5, 5), -- Course 5: Photo
-    (6, 6), -- Course 6: Photo
-    (7, 7); -- Course 7: photo
-
-
-
 
     -- more fake data  
 
