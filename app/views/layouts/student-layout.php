@@ -33,10 +33,7 @@
                     <i class="ri-file-text-line text-xl text-gray-500 group-hover:text-emerald-600"></i>
                     <span class="ml-3">Mes certificats</span>
                 </a>
-                <a href="/student/comments" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-emerald-100 group">
-                    <i class="ri-chat-1-line text-xl text-gray-500 group-hover:text-emerald-600"></i>
-                    <span class="ml-3">Mes commentaires</span>
-                </a>
+
             </div>
         </div>
     </aside>
