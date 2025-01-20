@@ -29,12 +29,16 @@ class CourseController extends BaseController
             $validator->validateName($_POST['name']);
             $validator->validateString($_POST['description'], 'Description');
             $validator->validateString($_POST['category_id'], 'Categorie');
-            $validator->validateString($_FILES['image']['name'], 'Image');
+            // $validator->validateString($_FILES['image']['name'], 'Image');
             $tags = [];
             if (isset($_POST['tags']) && is_array($_POST['tags'])) {
                 $tags = $_POST['tags'];
             }
-
+            // if (!empty($_FILES['photo']['name'])) {
+            //     Debug::dd($_POST, 999, $_FILES, $this->user['id']);
+            // } else {
+            //     Debug::dd($_POST, 777, $_FILES, $this->user['id']);
+            // }
             if ($validator->isValid()) {
                 // 
                 $this->courseModel->setName(Security::XSS($_POST['name']));
@@ -45,20 +49,35 @@ class CourseController extends BaseController
                 $courseid = $this->courseModel->create();
                 if ($courseid) {
                     // Attempt to upload the image
-                    if ($this->fileModel->upload($courseid, $_FILES['image'])) {
-
-                        $this->setFlashMessage('message', 'Course ajouté avec succès.');
-                        $this->redirect('/teacher/courses');
-                    } else {
-
-                        $this->setFlashMessage('error', 'Le cours a été ajouté, mais l\'image n\'a pas pu être téléchargée.');
-                        $this->redirect('/teacher/courses');
+                    if (!empty($_FILES['photo']['name'])) {
+                        if ($this->fileModel->upload($courseid, $_FILES['photo'])) {
+                            $this->setFlashMessage('message', 'Course ajouté avec succès.');
+                        } else {
+                            $this->setFlashMessage('error', 'Le cours a été ajouté, mais l\'image n\'a pas pu être téléchargée.');
+                        }
                     }
+                    
+                    if ($_POST['content_type'] === 'document' && !empty($_POST['document'])) {
+                        if ($this->fileModel->upload($courseid, ['name'=>'markdownd','document' => $_POST['document']] , true)) {
+                            $this->setFlashMessage('message', 'Course ajouté avec succès, avec le fichier Markdown.');
+                        } else {
+                            $this->setFlashMessage('error', 'Le cours a été ajouté, mais le fichier Markdown n\'a pas pu être créé.');
+                        }
+                    }
+                    // Handle video upload (if the video is not empty)
+                    elseif (!empty($_FILES['video']['name'])) {
+                        if ($this->fileModel->upload($courseid, $_FILES['video'])) {
+                            $this->setFlashMessage('message', 'Course ajouté avec succès, avec la vidéo.');
+                        } else {
+                            $this->setFlashMessage('error', 'Le cours a été ajouté, mais la vidéo n\'a pas pu être téléchargée.');
+                        }
+                    } 
                 } else {
                     // Error:
                     $this->setFlashMessage('error', 'L\'ajout du cours a échoué. Veuillez réessayer.');
                     $this->redirect('/teacher/course/add');
                 }
+                $this->redirect('/teacher/courses');
             } else {
                 // Validation failed
                 $_SESSION['errors'] = $validator->getErrors();
@@ -90,8 +109,8 @@ class CourseController extends BaseController
             $this->courseModel->setId($courseId);
             // check
             if ($this->courseModel->isUserEnrolled($this->user['id'])) {
-                echo 'User is already Enrolled';
-                return;
+                $this->setFlashMessage('error', ' deja enroll. ');
+                $this->redirect('/student/my-courses');
             }
             // enroll
             if ($this->courseModel->enrollUser($this->user['id'], $courseId)) {
