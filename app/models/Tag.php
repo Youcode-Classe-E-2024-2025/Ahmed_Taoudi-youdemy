@@ -108,21 +108,4 @@ class Tag {
         return $tags;
     }
 
-    public function getTagsByTask($course_id) {
-        $tags=[];
-        $query = "SELECT t.* FROM  $this->table  t
-                 JOIN course_tags tt ON t.id = tt.tag_id
-                 WHERE tt.course_id = :course_id
-                 ORDER BY t.name ";
-        $result = $this->conn->query($query, [':course_id' => $course_id]);
-        if($result){
-            foreach($result as $tg){
-                $new = new Tag();
-                $new->setId($tg['id']);
-                $new->setName($tg['name']);
-                $tags[]= $new ;
-            }
-        }
-        return $tags;
-    }
 }

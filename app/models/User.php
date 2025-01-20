@@ -16,8 +16,14 @@ class User
     protected Role $role;
     protected $created_at;
 
-    public function __construct()
+    public function __construct($name=null,$email=null,$password=null,UserStatus $status =UserStatus::PENDING ,Role $role =Role::STUDENT ,$created_at=null)
     {
+        $this->setName($name);
+        $this->setEmail($email);
+        $this->setPassword($password);
+        $this->setStatus($status);
+        $this->setRole($role);
+        $this->setCreatedAt($created_at);
         $this->conn = Database::getInstance();
     }
 
@@ -66,7 +72,7 @@ class User
         $this->email = $email;
     }
 
-    public function setPassword(string $password): void
+    public function setPassword($password): void
     {
         $this->password = $password;
     }
@@ -110,7 +116,7 @@ class User
         }
     }
 
-    public function read($id = 1, $status = 'active' ,$order = null): array
+    public function read($id = 0, $status = 'active' ,$order = null): array
     {
         $users = [];
         $query = "SELECT u.* FROM $this->table  u WHERE u.role != 'admin' " ;
@@ -172,35 +178,15 @@ class User
         }
     }
 
-    // SOFT DELETE 
-    public function delete(): bool
+    // update (set status to $status ) delete howa archived 
+    public function updateStatus($status): bool
     {
         $query = "UPDATE " . $this->table . "
-                  SET status = :archived
+                  SET status = :status
                   WHERE id = :id";
 
         $params = [
-            ':archived' => UserStatus::ARCHIVED->value,
-            ':id' => $this->id
-        ];
-
-        try {
-            $this->conn->query($query, $params);
-            return true;
-        } catch (PDOException $e) {
-            error_log("Error deleting user: " . $e->getMessage());
-            return false;
-        }
-    }
-    // Restore (set status to active) 
-    public function restore(): bool
-    {
-        $query = "UPDATE " . $this->table . "
-                  SET status = :active
-                  WHERE id = :id";
-
-        $params = [
-            ':active' => UserStatus::ACTIVE->value,
+            ':status' => UserStatus::from($status)->value,
             ':id' => $this->id
         ];
 
@@ -265,13 +251,8 @@ class User
         }
     }
     private function createObject($user){
-        $object = new User();
+        $object = new User($user['name'],$user['email'],'',UserStatus::from($user['status']),Role::from($user['role']),$user['created_at']);
        $object->setId($user['id']);
-       $object->setName($user['name']);
-       $object->setEmail($user['email']);
-       $object->setCreatedAt($user['created_at']);
-       $object->setStatus(UserStatus::from($user['status']));
-       $object->setRole(Role::from($user['role']));
        return $object;
     }
 
