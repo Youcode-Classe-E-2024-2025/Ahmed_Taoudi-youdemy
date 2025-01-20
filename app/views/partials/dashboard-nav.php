@@ -7,7 +7,7 @@
                 <i class="ri-menu-line text-xl text-gray-500"></i>
             </button>
             <!-- Application Name -->
-            <h1 class="text-2xl font-bold text-emerald-600">Youdemy</h1>
+            <a href="/"><h1 class="text-2xl font-bold text-emerald-600">Youdemy</h1></a>
         </div>
 
         <!-- Right Section: Logout Button -->

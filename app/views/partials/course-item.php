@@ -10,9 +10,11 @@
     <div class="p-6">
 
         <!-- Title -->
-        <h2 class="text-xl font-semibold text-gray-900 mb-2">
-            <?= htmlspecialchars($course->getName()) ?>
-        </h2>
+        <a href="/course?id=<?= $course->getId(); ?>">
+            <h2 class="text-xl font-semibold text-gray-900 mb-2">
+                <?= htmlspecialchars($course->getName()) ?>
+            </h2>
+        </a>
 
         <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
             <i class="ri-folder-line mr-1"></i>
