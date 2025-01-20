@@ -72,8 +72,6 @@ VALUES
     (7, 9, NOW()); -- Hassan enrolled in Machine Learning Basics
 
 
-    -- more fake data  
-
     -- Insert 30 more fake courses
 INSERT INTO courses (name, description, category_id, created_by, created_at)
 VALUES

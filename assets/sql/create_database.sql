@@ -98,4 +98,4 @@ CREATE TABLE IF NOT EXISTS course_files (
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
     FOREIGN KEY (file_id) REFERENCES files(id) ON DELETE CASCADE
 );
-*
+
