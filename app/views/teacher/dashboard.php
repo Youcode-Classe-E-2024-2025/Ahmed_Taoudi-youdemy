@@ -59,11 +59,10 @@
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
         <h2 class="text-xl font-semibold text-gray-700 mb-4">Profile Summary</h2>
         <div class="flex items-center space-x-4">
-            <img src="assets/images/profile.jpg" alt="Profile Picture" class="w-16 h-16 rounded-full">
+           
             <div>
-                <h3 class="text-lg font-medium text-gray-700">Jane Doe</h3>
-                <p class="text-sm text-gray-500">jane.doe@example.com</p>
-                <a href="/teacher/profile" class="text-emerald-600 hover:text-emerald-700">Edit Profile</a>
+            <h3 class="text-lg font-medium text-gray-700"><?= $this->teacherModel->getName();?></h3>
+            <p class="text-sm text-gray-500"><?= $this->teacherModel->getEmail();?></p>
             </div>
         </div>
     </div>

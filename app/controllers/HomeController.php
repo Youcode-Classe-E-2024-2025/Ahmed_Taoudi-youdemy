@@ -24,7 +24,7 @@ class HomeController extends BaseController
         $limit = 9;
         $ctg_id = isset($_GET['category']) ? (int)$_GET['category'] : null ; 
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1 ; 
-        $search = isset($_GET['q']) ? trim($_GET['q']) : '';  
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';  
         $count = $this->courseModel->getCount($ctg_id,$search);
         $totalPages =ceil( $count/$limit) ;
         // validation

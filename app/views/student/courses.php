@@ -12,29 +12,44 @@
                 </p>
             </div>
 
+ 
             <!-- Search and Filters -->
             <div class="mb-8">
                 <!-- Search Bar -->
                 <div class="mb-6">
-                    <input
-                        type="text"
-                        id="search"
-                        placeholder="Search for a course..."
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                     <form method="GET" action="" id="search-form">
+                        <div class="flex items-center">
+                            <!-- Search Input -->
+                             <input type="hidden" name="category" value="<?= isset($_GET['category']) ? htmlspecialchars($_GET['category']) : '' ?>">
+                           
+                            <input
+                                type="text"
+                                id="search"
+                                name="search"
+                                placeholder="Search for a course..."
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>" /> <!-- Retain the search term -->
+
+                            <!-- Search Button -->
+                            <button type="submit" class="ml-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                Search
+                            </button>
+                        </div>
+                        </form>
                 </div>
 
                 <!-- Category Buttons -->
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Filter by Category</h3>
                     <div class="flex flex-wrap gap-2" id="category-buttons">
-                        <a href="/student/courses">
+                        <a href="/courses">
                             <span class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 ease-in-out">
                                 All Categories
                             </span>
                         </a>
                         <?php foreach ($categories as $category): ?>
                             <a href="?category=<?= htmlspecialchars($category->getId()) ?>">
-                                <span class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 ease-in-out">
+                                <span class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700 <?= isset($_GET['category']) && $_GET['category'] ==  htmlspecialchars($category->getId()) ?  ' bg-green-200 hover:bg-green-50 ' : ' bg-white hover:bg-green-50 ' ?>  transition-all duration-200 ease-in-out">
                                     <?= htmlspecialchars($category->getName()) ?>
                                 </span>
                             </a>

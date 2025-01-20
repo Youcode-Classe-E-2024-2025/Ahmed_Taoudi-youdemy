@@ -66,7 +66,8 @@ class StudentController extends BaseController
         $limit = 9;
         $ctg_id = isset($_GET['category']) ? (int)$_GET['category'] : null ; 
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1 ; 
-        $count = $this->courseModel->getCount($ctg_id);
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';  
+        $count = $this->courseModel->getCount($ctg_id,$search);
         $totalPages =ceil( $count/$limit) ;
         // validation
         if($page <= 0 || $page >$totalPages){ 
@@ -76,9 +77,9 @@ class StudentController extends BaseController
         $offset = $limit * ($page-1);
         if($ctg_id){
 
-            $courses = $this->courseModel->getCoursesByCategory($ctg_id,$limit,$offset);
+            $courses = $this->courseModel->getCoursesByCategory($ctg_id,$limit,$offset, $search);
         }else{
-            $courses = $this->courseModel->getCourses($limit,$offset);
+            $courses = $this->courseModel->getCourses($limit,$offset, $search);
         }
 
         $categories = $this->categoryModel->getAllCategories();
