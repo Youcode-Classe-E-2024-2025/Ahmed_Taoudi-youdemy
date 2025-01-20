@@ -47,4 +47,26 @@ class CategoryController extends BaseController
             $this->_404();
         }
     }
+
+    public function delete()
+    {
+        if ($this->isPost()) {
+            $token = $_POST['csrf_token'] ?? '';
+            if (!Security::verifyCSRFToken($token)) {
+                $this->setFlashMessage('error', 'CSRF token validation failed. Possible CSRF attack.');
+                Security::regenerateCSRFToken();
+                $this->redirect('/login');
+            }
+            $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+            $this->categoryModel->setId($id);
+            if ($this->categoryModel->delete()) {
+                $this->setFlashMessage('message', ' suprresion de category avec succès');
+            } else {
+                $this->setFlashMessage('error', 'suprresion de category  a échoué');
+            }
+            $this->redirect("/admin/categories");
+        } else {
+            $this->_404();
+        }
+    }
 }
