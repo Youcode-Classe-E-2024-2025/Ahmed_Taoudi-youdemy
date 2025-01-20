@@ -48,6 +48,26 @@ class HomeController extends BaseController
         'totalPages'=>$totalPages ,
         'tags'=>$tags ]);
     }
+
+    public function courseDetails(){
+
+        if($this->isGet()){
+            $courseId =isset($_GET['id']) ? (int)$_GET['id'] : 0  ;
+
+            if($courseId <= 0){
+                $this->_404();
+            }
+
+           $this->courseModel->getById($courseId);
+        //    Debug::dd($this->courseModel);
+            $content = "app/views/course/details.php";
+            $this->render('course_details',
+            ['course'=>$this->courseModel,
+            'content'=>$content ]);
+        }else{
+            $this->_404();
+        }
+    }
     
 
 }
