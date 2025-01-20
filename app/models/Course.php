@@ -18,9 +18,9 @@ class Course
     private bool $visibility;
 
     // Constructor
-    public function __construct($name=null,$description=null,$category_id =null ,$tags=[],$created_by=null,$created_at=null,File $image=new File(),File $content=new File() )
+    public function __construct($name = null, $description = null, $category_id = null, $tags = [], $created_by = null, $created_at = null, File $image = new File(), File $content = new File())
     {
-        
+
         $this->setName($name);
         $this->setDescription($description);
         $this->setOwner($created_by);
@@ -66,10 +66,12 @@ class Course
     {
         return $this->tags;
     }
-    public function getImage(){
+    public function getImage()
+    {
         return $this->image;
     }
-    public function getContent(){
+    public function getContent()
+    {
         return $this->content;
     }
 
@@ -94,14 +96,16 @@ class Course
         $this->category = new Category();
         $this->category->read($categoryID);
     }
-    
-     public function  setImage($file){
-       $this->image = $file;
+
+    public function  setImage($file)
+    {
+        $this->image = $file;
     }
 
-    public function  setContent($file){
+    public function  setContent($file)
+    {
         $this->content = $file;
-     }
+    }
 
     public function setOwner($user_id)
     {
@@ -114,26 +118,33 @@ class Course
         $this->created_at = date('d M Y', strtotime($date));
     }
 
-    public function setTags($tags_ids){
-        foreach($tags_ids as $id){
+    public function setTags($tags_ids)
+    {
+        foreach ($tags_ids as $id) {
             $tag = new Tag();
-           if ($tag->read($id)){
-            $this->tags[]= $tag;
-           }
+            if ($tag->read($id)) {
+                $this->tags[] = $tag;
+            }
         }
     }
 
-    public function getCourses($limit = 0, $offset = 0)
+    public function getCourses($limit = 0, $offset = 0, $search = '')
     {
         $query = "SELECT c.*,   MAX(f.id) AS image_id,    MAX(f.name) AS image_name,   MAX(f.path) AS image_path
                 FROM $this->table c
                 LEFT JOIN course_files cf ON c.id = cf.course_id
                 LEFT JOIN files f ON cf.file_id = f.id 
-                    AND f.file_type_id = (SELECT id FROM file_types WHERE name = 'photo')  
-                GROUP BY c.id
-                ORDER BY c.created_at DESC";
+                    AND f.file_type_id = (SELECT id FROM file_types WHERE name = 'photo')  ";
 
         $params = [];
+        if (!empty($search)) {
+            $query .= " WHERE c.name LIKE :search OR c.description LIKE :search";
+            $params['search'] = '%' . $search . '%';
+        }
+
+        $query .= " GROUP BY c.id
+                ORDER BY c.created_at DESC";
+
 
         $results = $this->conn->pagination($query, $params, $limit, $offset)->fetchAll();
         $courses = [];
@@ -184,7 +195,7 @@ class Course
             $this->setName($result['name']);
             $this->setDescription($result['description']);
             $this->setOwner($result['created_by']);
-            $this->setImage(new File($result['image_name'],$result['image_path'],'photo'));
+            $this->setImage(new File($result['image_name'], $result['image_path'], 'photo'));
             $this->setCategory($result['category_id']);
             $this->tags = $this->getTagsBycourse($result['id']);
         }
@@ -260,24 +271,24 @@ class Course
         if (empty($this->tags)) {
             return false;
         }
-        
+
         $tagCoursePairs = [];
-        
-        foreach ($this->tags as $tag) {
-            
-            $id =$tag->getId();
-            $tagCoursePairs[] = "(:course_id, :tag_id_$id)";
-        }
- 
-        $query = "INSERT INTO course_tags (course_id, tag_id) 
-                VALUES " . implode(", ", $tagCoursePairs) . "
-                ON DUPLICATE KEY UPDATE tag_id = VALUES(tag_id)";  
- 
-        $params = [':course_id' => $this->id]; 
 
         foreach ($this->tags as $tag) {
-            $id =$tag->getId();
-            $params[":tag_id_$id"] = $id; 
+
+            $id = $tag->getId();
+            $tagCoursePairs[] = "(:course_id, :tag_id_$id)";
+        }
+
+        $query = "INSERT INTO course_tags (course_id, tag_id) 
+                VALUES " . implode(", ", $tagCoursePairs) . "
+                ON DUPLICATE KEY UPDATE tag_id = VALUES(tag_id)";
+
+        $params = [':course_id' => $this->id];
+
+        foreach ($this->tags as $tag) {
+            $id = $tag->getId();
+            $params[":tag_id_$id"] = $id;
         }
 
         try {
@@ -289,17 +300,24 @@ class Course
         }
     }
 
-    public function getCoursesByCategory($ctg_id,$limit = 0, $offset = 0)
+    public function getCoursesByCategory($ctg_id, $limit = 0, $offset = 0 , $search='')
     {
         $query = " SELECT c.*,   MAX(f.id) AS image_id,    MAX(f.name) AS image_name,   MAX(f.path) AS image_path
                 FROM $this->table c
                 LEFT JOIN course_files cf ON c.id = cf.course_id
                 LEFT JOIN files f ON cf.file_id = f.id 
                 AND f.file_type_id = (SELECT id FROM file_types WHERE name = 'photo') 
-                WHERE c.category_id = :ctg_id
-                GROUP BY c.id
-                ORDER BY c.created_at DESC"; 
-        $params = ['ctg_id'=>$ctg_id];
+                WHERE c.category_id = :ctg_id ";
+                 $params = [];
+                 $params['ctg_id'] = $ctg_id;
+
+                 if (!empty($search)) {
+                     $query .= " AND c.name LIKE :search OR c.description LIKE :search";
+                     $params['search'] = '%' . $search . '%';
+                 }
+         
+                 $query .= " GROUP BY c.id
+                         ORDER BY c.created_at DESC";
 
         $results = $this->conn->pagination($query, $params, $limit, $offset)->fetchAll();
         $courses = [];
@@ -311,58 +329,68 @@ class Course
         return $courses;
     }
 
-    public function createObject($row){
-        $course = new Course($row['name'],$row['description'],$row['category_id'],$this->getTagsBycourse($row['id']),$row['created_by'],$row['created_at'],new File($row['image_name'],$row['image_path'],'photo'));
+    public function createObject($row)
+    {
+        $course = new Course($row['name'], $row['description'], $row['category_id'], $this->getTagsBycourse($row['id']), $row['created_by'], $row['created_at'], new File($row['image_name'], $row['image_path'], 'photo'));
         $course->setId($row['id']);
-       return $course;
+        return $course;
     }
 
-    public function getCount($ctg_id=null){
+    public function getCount($ctg_id = null,$search = '')
+    {
 
         $query = "SELECT  COUNT(*)
-                FROM $this->table c ";
+                FROM $this->table c WHERE 1=1 ";
         $params = [];
-        if($ctg_id){
-            $query .= " WHERE c.category_id = :id ";
-           $params['id'] = $ctg_id ;
+
+        if (!empty($search)) {
+            $query .= " AND c.name LIKE :search OR c.description LIKE :search";
+            $params['search'] = '%' . $search . '%';
         }
 
-        return $this->conn->query($query,$params)->fetchColumn();
+        if ($ctg_id) {
+            $query .= " AND c.category_id = :id ";
+            $params['id'] = $ctg_id;
+        }
+
+        return $this->conn->query($query, $params)->fetchColumn();
     }
 
-    public function findById($id){
+    public function findById($id)
+    {
         $query = "SELECT *
                 FROM $this->table c 
                 WHERE c.id = :id ";
-        $params['id'] = $id ;
-        $result = $this->conn->query($query,$params)->fetch();
+        $params['id'] = $id;
+        $result = $this->conn->query($query, $params)->fetch();
 
-        if($result){
+        if ($result) {
             return true;
         }
         return false;
     }
-    
-    public function isUserEnrolled($userId){
+
+    public function isUserEnrolled($userId)
+    {
         $query = "SELECT * FROM student_course WHERE student_id = :user_id AND course_id = :course_id";
-       $params =['user_id' => $userId, 'course_id' => $this->getId()];
-        
-       $result = $this->conn->query($query,$params)->fetch();
-       if($result){
-           return true;
-       }
-       return false;
+        $params = ['user_id' => $userId, 'course_id' => $this->getId()];
+
+        $result = $this->conn->query($query, $params)->fetch();
+        if ($result) {
+            return true;
+        }
+        return false;
     }
 
-    public function enrollUser($userId){
+    public function enrollUser($userId)
+    {
         $query = "INSERT INTO student_course (course_id, student_id  ) VALUES ( :course_id , :user_id) ";
-        $params =['user_id' => $userId, 'course_id' => $this->getId()];
-        
-       $result = $this->conn->query($query,$params);
-       if($result){
-           return true;
-       }
-       return false;
+        $params = ['user_id' => $userId, 'course_id' => $this->getId()];
+
+        $result = $this->conn->query($query, $params);
+        if ($result) {
+            return true;
+        }
+        return false;
     }
-    
 }

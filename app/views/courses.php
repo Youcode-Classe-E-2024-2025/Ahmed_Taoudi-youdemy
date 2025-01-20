@@ -84,9 +84,9 @@
                     <?php endforeach; ?>
                 </div>
 
-                <?php if($totalPages > 1):?>
+
                 <?php require_once 'app/views/partials/pagination-nav.php' ?>
-                <?php endif;?>
+
 
             <?php else: ?>
                 <!-- No Courses Found -->
