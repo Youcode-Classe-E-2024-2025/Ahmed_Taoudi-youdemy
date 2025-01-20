@@ -72,4 +72,36 @@ class CourseController extends BaseController
             $this->_404();
         }
     }
+    public function enroll()
+    {
+
+        $this->requireRole(Role::STUDENT);
+
+        if ($this->isPost()) {
+            $courseId = isset($_POST['course_id']) ? (int) $_POST['course_id'] : 0;
+
+            if ($courseId <= 0) {
+                return $this->_404();
+            }
+            $course = $this->courseModel->findById($courseId);
+            if (!$course) {
+                return  $this->_404();
+            }
+            $this->courseModel->setId($courseId);
+            // check
+            if ($this->courseModel->isUserEnrolled($this->user['id'])) {
+                echo 'User is already Enrolled';
+                return;
+            }
+            // enroll
+            if ($this->courseModel->enrollUser($this->user['id'], $courseId)) {
+                $this->setFlashMessage('message', 'enroll avec succès.');
+            } else {
+                $this->setFlashMessage('error', 'enroll  a échoué.');
+            }
+            $this->redirect('/student/my-courses');
+        } else {
+            $this->_404();
+        }
+    }
 }
