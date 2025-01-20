@@ -47,4 +47,26 @@ class TagController extends BaseController
             $this->_404();
         }
     }
+
+    public function delete()
+    {
+        if ($this->isPost()) {
+            $token = $_POST['csrf_token'] ?? '';
+            if (!Security::verifyCSRFToken($token)) {
+                $this->setFlashMessage('error', 'CSRF token validation failed. Possible CSRF attack.');
+                Security::regenerateCSRFToken();
+                $this->redirect('/login');
+            }
+            $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+            $this->tagModel->setId($id);
+            if ($this->tagModel->delete()) {
+                $this->setFlashMessage('message', ' suprresion de tag avec succès');
+            } else {
+                $this->setFlashMessage('error', 'suprresion de tag  a échoué');
+            }
+            $this->redirect("/admin/tags");
+        } else {
+            $this->_404();
+        }
+    }
 }
