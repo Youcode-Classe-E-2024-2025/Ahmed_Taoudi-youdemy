@@ -3,7 +3,7 @@
 
 class StudentController extends BaseController
 {
-    private Student $studentModel;
+    public Student $studentModel;
     private Course $courseModel ;
     private Category $categoryModel ;
     private Tag $tagModel ;
@@ -12,7 +12,8 @@ class StudentController extends BaseController
     public function __construct()
     {
         parent::__construct();
-        $this->studentModel = new Student();
+        $this->studentModel = new Student($this->user['name'],$this->user['email']);
+        $this->studentModel->setId($this->user["id"]);
         $this->courseModel = new Course();
         $this->categoryModel = new Category();
         $this->tagModel = new Tag();
@@ -22,9 +23,11 @@ class StudentController extends BaseController
     public function index()
     {
         $this->requireRole(Role::STUDENT);
-
+        // Debug::dd($this->user);
         if ($this->isGet()) {
-            $this->render('student');
+            $content = "app/views/student/dashboard.php";
+            $this->render('student',
+            ['content'=>$content ]);
         }else{
             $this->_404();
         }

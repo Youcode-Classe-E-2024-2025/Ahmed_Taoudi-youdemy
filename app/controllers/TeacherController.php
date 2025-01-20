@@ -3,7 +3,7 @@
 
 class TeacherController extends BaseController
 {
-    private Teacher $teacherModel;
+    public Teacher $teacherModel;
     private Course $courseModel ;
     private Category $categoryModel ;
     private Tag $tagModel ;
@@ -11,7 +11,8 @@ class TeacherController extends BaseController
     public function __construct()
     {
         parent::__construct();
-        $this->teacherModel = new Teacher();
+        $this->teacherModel = new Teacher($this->user['name'],$this->user['email']);
+        $this->teacherModel->setId($this->user["id"]);
         $this->tagModel = new Tag();
         $this->categoryModel = new Category();
     }
@@ -34,7 +35,7 @@ class TeacherController extends BaseController
         
         if ($this->isGet()) {
             $this->teacherModel->setId($this->user["id"]);
-            $limit=10;
+            $limit=9;
             $page = isset($_GET['page']) ? (int)$_GET['page'] : 1 ; 
             $count = $this->teacherModel->getCount();
             // Debug::pd($count);

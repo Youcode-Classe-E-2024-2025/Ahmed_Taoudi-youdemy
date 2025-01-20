@@ -84,4 +84,7 @@ class BaseController {
         require "app/views/errors/403.php";
         exit;
     }
+    protected function _is($role){
+        return isset($_SESSION['user']) && $_SESSION['user']['role'] == $role;
+    }
 }
