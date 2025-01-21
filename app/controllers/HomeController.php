@@ -60,9 +60,19 @@ class HomeController extends BaseController
                 $this->_404();
             }
 
-           $this->courseModel->getById($courseId);
-        //    Debug::dd($this->courseModel);
-            $content = "app/views/course/details.php";
+            $this->courseModel->getById($courseId);
+            $this->courseModel->getContent()->getByCourseId($courseId);
+
+            $contentType =$this->courseModel->getContent()->getFileType();
+            if( $contentType == 'markdown'){
+                $content = "app/views/course/details.php";
+            }else{
+                $content = "app/views/course/details-video.php";
+            }
+
+            // $this->courseModel->showContent();
+        //    echo($this->courseModel->showContent()); 
+        //    Debug::pd($contentType,$this->courseModel);
             $this->render('course_details',
             ['course'=>$this->courseModel,
             'content'=>$content ]);

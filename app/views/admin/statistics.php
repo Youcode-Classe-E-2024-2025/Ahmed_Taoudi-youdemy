@@ -4,19 +4,19 @@
         <!-- Total Users -->
         <div class="bg-gray-50 p-6 rounded-lg">
             <h3 class="text-lg font-medium text-gray-700">Utilisateurs inscrits</h3>
-            <p class="text-2xl font-bold text-emerald-600">1,200</p>
+            <p class="text-2xl font-bold text-emerald-600"><?= $this->userModel->countUsers() ;?></p>
         </div>
 
         <!-- Total Courses -->
         <div class="bg-gray-50 p-6 rounded-lg">
-            <h3 class="text-lg font-medium text-gray-700">Cours disponibles</h3>
-            <p class="text-2xl font-bold text-blue-600">85</p>
+            <h3 class="text-lg font-medium text-gray-700">Cours</h3>
+            <p class="text-2xl font-bold text-blue-600"><?= $this->courseModel->getCount();?></p>
         </div>
 
         <!-- Total Certificates -->
-        <div class="bg-gray-50 p-6 rounded-lg">
+        <!-- <div class="bg-gray-50 p-6 rounded-lg">
             <h3 class="text-lg font-medium text-gray-700">Certificats délivrés</h3>
             <p class="text-2xl font-bold text-purple-600">500</p>
-        </div>
+        </div> -->
     </div>
 </div>

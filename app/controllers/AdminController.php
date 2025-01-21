@@ -3,10 +3,10 @@
 
 class AdminController extends BaseController
 {
-    private User $userModel;
-    private Category $categoryModel;
-    private Tag $tagModel;
-    private Course $courseModel;
+    public User $userModel;
+    public Category $categoryModel;
+    public Tag $tagModel;
+    public Course $courseModel;
 
     public function __construct()
     {

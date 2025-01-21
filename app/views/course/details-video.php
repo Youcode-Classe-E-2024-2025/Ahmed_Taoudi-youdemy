@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
     <title>Course Details - Youdemy</title>
 </head>
 
@@ -17,7 +15,7 @@
     <!-- Course Details Section -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            
+
             <!-- Course Photo -->
             <img src="/<?= $course->getImage()->getPath() ?? 'assets/img/youdemy_home_2.svg' ?>"
                 alt="Course Photo" class="w-full h-96 object-cover">
@@ -31,17 +29,17 @@
                         <?= htmlspecialchars($course->getName()) ?>
                     </h1>
                     <!-- Enrollment Button -->
-                    <?php if($this->_is(Role::ADMIN->value) || $this->_is(Role::TEACHER->value) ): ?>
-                    <?php else:?>
-                    <div class="mt-6">
-                        <form action="/enroll" method="POST">
-                            <input type="hidden" name="course_id" value="<?= $course->getId() ?>">
-                            <button type="submit" class="inline-block bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-500">
-                                S'inscrire au cours 
-                            </button>
-                        </form>
-                    </div>
-                    <?php endif ;?>
+                    <?php if ($this->_is(Role::ADMIN->value) || $this->_is(Role::TEACHER->value)): ?>
+                    <?php else: ?>
+                        <div class="mt-6">
+                            <form action="/enroll" method="POST">
+                                <input type="hidden" name="course_id" value="<?= $course->getId() ?>">
+                                <button type="submit" class="inline-block bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-500">
+                                    S'inscrire au cours
+                                </button>
+                            </form>
+                        </div>
+                    <?php endif; ?>
 
                 </div>
 
@@ -85,33 +83,16 @@
             <div class="p-6 bg-gray-50">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Contenu du cours</h2>
                 <div class="space-y-4">
+                    <video width="600" controls>
+                        <source src="/<?= $course->showContent() ?>" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                     <?php $course->getContent() ?>
                 </div>
             </div>
-
-
-<div class="bg-gray-900 min-h-screen text-white">
-
-<div id="preview" class=" p-10"></div>
-</div>
-        <script>
-        const markdown = document.getElementById("editor");
-
-            const simplemde = new SimpleMDE({ 
-
-        element: markdown,
-        toolbar: false,
-        placeholder: "Write your Description here..."
-        });
-        const content =<?php echo json_encode(htmlspecialchars_decode($course->showContent())); ?>;
-        document.getElementById("preview").innerHTML = simplemde.markdown(content);
-        </script>
-
-
         </div>
-    </div>
 
-    <?php require_once "app/views/partials/footer.php"; ?>
+        <?php require_once "app/views/partials/footer.php"; ?>
 </body>
 
 </html>

@@ -393,4 +393,27 @@ class Course
         }
         return false;
     }
+    public function showContent()
+    {
+       
+        $fileType = $this->getContent()->getFileType(); 
+        
+        if ($fileType == 'video') {
+
+             return  $this->getContent()->getPath();
+
+        } elseif ($fileType == 'markdown') {
+            
+            $filePath =$this->getContent()->getPath();
+            if (file_exists($filePath)) {
+                return file_get_contents($filePath);
+            } else {
+                return 'Markdown file not found.';
+            }
+        } else {
+         
+            return null;
+        }
+    }
+    
 }

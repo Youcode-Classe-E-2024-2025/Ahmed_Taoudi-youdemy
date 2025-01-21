@@ -52,6 +52,10 @@ class File
     {
         $this->path = $path;
     }
+    public function setFileType($file_type)
+    {
+        $this->file_type = $file_type;
+    }
 
     public function upload($courseId, $file ,$content = false)
     {
@@ -97,10 +101,10 @@ class File
 
     private function uploadMarkdown($courseId, $file)
     {
-        // Markdown content is provided in the 'document' field of the form
+
         $markdownContent = $file['document'];
 
-        // Define the Markdown file name
+
         $markdownFileName = "document_{$courseId}_" . uniqid() . ".md";
         $uploadDir = "uploads/courses/$courseId/";
 
@@ -109,10 +113,10 @@ class File
             mkdir($uploadDir, 0777, true);
         }
 
-        // Path for the Markdown file
+
         $markdownFilePath = $uploadDir . $markdownFileName;
 
-        // Save the Markdown content to a file
+
         if (file_put_contents($markdownFilePath, $markdownContent)) {
             // Save the metadata for the Markdown file
             $fileType = 'markdown';
@@ -204,8 +208,16 @@ class File
                   FROM $this->table f 
                   JOIN file_types ft ON f.file_type_id = ft.id 
                   JOIN course_files cf ON f.id = cf.file_id 
-                  WHERE cf.course_id = :course_id";
+                  WHERE cf.course_id = :course_id and ft.name != 'photo' ";
         $params = [':course_id' => $courseId];
-        return $this->conn->query($query, $params)->fetchAll();
+
+        $result = $this->conn->query($query, $params)->fetch();
+        if($result){
+            $this->setPath($result['path']);
+            $this->setName($result['name']);
+            $this->setFileType($result['file_type']);
+            return true ;
+        }
+        return false ;
     }
 }
