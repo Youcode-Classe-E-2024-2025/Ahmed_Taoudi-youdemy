@@ -136,7 +136,7 @@
                             <label for="video-file" class="block text-sm font-medium text-gray-700">Upload Video</label>
                             <input type="file" name="video" id="video-file" accept="video/*"
                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-200 file:text-green-700 hover:file:bg-green-100">
-                            <p class="text-sm text-gray-500">Maximum file size: 10MB</p>
+                            <p class="text-sm text-gray-500">Maximum file size: 99MB</p>
                             <p id="video-error" class="mt-1 text-sm text-red-600 hidden">Please upload a video file</p>
                         </div>
                         
